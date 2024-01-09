@@ -100,6 +100,12 @@ def eml_to_html(eml_path_str: Union[str, Path], output_path: str, save_attachmen
                 content_ids.append((id, filename))
 
         if raw_html:
+            # add css
+            raw_html = raw_html.replace(
+                '<html><head>', 
+                "<html><head><link rel='stylesheet' type='text/css' href='../../index.css'>"
+            )
+            
             # replace cids in html with img path
             raw_html = f"{raw_html}".lstrip("b'").rstrip("'")
             for cid, filename in content_ids:
@@ -168,7 +174,7 @@ def append_index(output_path: str, page_paths: List[Path]) -> None:
         relative_path_dir = os.path.dirname(relative_path)[len("updates/") :]
         index_html += f'\n<a href="{relative_path}">{relative_path_dir}</a><br/>'
 
-    print(f"🟢 Add the following links to you main index.html: \n\n`{index_html}`")
+    print(f"\n🟢 Add the following links to you main index.html: \n{index_html}")
 
 
 def main():
@@ -178,7 +184,7 @@ def main():
 
     output_path: str = sys.argv[1]
     file_paths: List[str] = sys.argv[2:]
-    save_attachments = False
+    save_attachments = True
 
     page_paths = []
     for file_path in file_paths:
