@@ -4,6 +4,7 @@ Tiny CLI tool that batch converts `.eml` email files to `.html` files to create 
 
 ## Installation
 Install python
+Run `pip install -r requirements.txt` to install dependencies
 
 ## Usage
 ```

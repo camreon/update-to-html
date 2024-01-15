@@ -9,6 +9,7 @@ from typing import Any, List, Union
 from PIL import Image
 from pillow_heif import register_heif_opener
 import urllib.parse
+from dateutil.parser import parse
 
 register_heif_opener()
 
@@ -149,7 +150,11 @@ def create_html_element(filename: str) -> str:
 def create_index(output_path: str, page_paths: List[Path]) -> None:
     # create index page with links to each sub page
     output_path = str(Path(output_path).parent)
-    page_paths.reverse()
+
+    # todo: should sort by date here
+    # see if this works
+    # page_paths.sort(key=lambda x: parse(x.split('</a>')[0].split('>')[1]))
+    # page_paths.reverse()
 
     index_html = "<html><head></head><body>"
     for page_path in page_paths:
@@ -163,10 +168,14 @@ def create_index(output_path: str, page_paths: List[Path]) -> None:
         html_file.write(index_html)
         print(f"🟢 Written index page `{html_path}`")
 
+
 def append_index(output_path: str, page_paths: List[Path]) -> None:
     # add new sub page links to existing index page
     output_path = str(Path(output_path).parent)
-    page_paths.reverse()
+    
+    # todo: see if this works
+    # page_paths.sort(key=lambda x: parse(x.split('</a>')[0].split('>')[1]))
+    # page_paths.reverse()
 
     index_html = ''
     for page_path in page_paths:

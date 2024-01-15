@@ -1,0 +1,14 @@
+- install python from https://www.python.org/downloads/
+- open Terminal.app at this folder
+    - you should be able to right click the unzipped folder, go to "Services", then select "New Terminal at Folder"
+- in the terminal run `pip install -r requirements.txt` to install dependencies
+    - (if this doesn't work, there might be a problem with your python install)
+
+- open "eml_to_html.sh" in a text editor
+- edit the last item on the last line to the filepath of where your .eml file(s) is located
+    - e.g. replace "../../../Downloads/Update/*/*.eml" with "C:/Username/Downloads/202401.eml"
+- save the file
+
+- in the terminal run `./eml_to_html.sh` 
+    - (if this doesn't work, you might need to fix the file's permissions by running `chmod +x eml_to_html.sh`)
+- you should see output telling you which html pages it created and where
