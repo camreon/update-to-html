@@ -9,7 +9,7 @@ from typing import Any, List, Union
 from PIL import Image
 from pillow_heif import register_heif_opener
 import urllib.parse
-from dateutil.parser import parse
+# from dateutil.parser import parse
 
 register_heif_opener()
 
@@ -43,7 +43,14 @@ def eml_to_html(eml_path_str: Union[str, Path], output_path: str, save_attachmen
 
     with eml_path.open(mode="r") as eml_file:
         message: Message = message_from_file(eml_file, policy=default)
-        date = message["Date"][:-6]  # remove timezone
+        
+        # remove timezone
+        date = message["Date"][:-6]
+        # move day of the week
+        day, date = date.split(' ', 1)
+        date_parts = date.split(' ')
+        date_parts = date_parts[:3] + [day] + date_parts[3:]
+        date = ' '.join(date_parts)
 
         directory = os.path.join(output_path, date)
         try:
@@ -53,6 +60,8 @@ def eml_to_html(eml_path_str: Union[str, Path], output_path: str, save_attachmen
 
         raw_html = None
         content_ids = []
+        text_content = []
+
         for part in message.walk():
             # multipart/* are just containers
             if part.get_content_maintype() == "multipart":
@@ -63,6 +72,8 @@ def eml_to_html(eml_path_str: Union[str, Path], output_path: str, save_attachmen
 
             if ext == ".html" and not raw_html:
                 raw_html = part.get_payload(decode=True).decode()
+            elif ext == ".txt":
+                text_content.append(part.get_payload(decode=True).decode())
             else:
                 if not filename:
                     # print(f"🟡 Skipping part; no filename; {part['Content-Type']}")
@@ -104,11 +115,13 @@ def eml_to_html(eml_path_str: Union[str, Path], output_path: str, save_attachmen
             # add css
             raw_html = raw_html.replace(
                 '<html><head>', 
-                "<html><head><link rel='stylesheet' type='text/css' href='../../index.css'>"
+                "<html><head><link rel='stylesheet' type='text/css' href='../../index.css'><meta charset='utf-8'>"
             )
             
             # replace cids in html with img path
             raw_html = f"{raw_html}".lstrip("b'").rstrip("'")
+            for text in text_content:
+                raw_html += f'<div>{text}</div>'
             for cid, filename in content_ids:
                 if not filename:
                     print(f"🟡 Skipping cid; no filename; {cid}")
@@ -118,7 +131,9 @@ def eml_to_html(eml_path_str: Union[str, Path], output_path: str, save_attachmen
                     raw_html = raw_html.replace(f"cid:{cid}", make_safe(filename))
         else:
             # create html from img paths
-            raw_html = "<html><head><link rel='stylesheet' type='text/css' href='../../index.css'></head><body>"
+            raw_html = "<html><head><link rel='stylesheet' type='text/css' href='../../index.css'><meta charset='utf-8'></head><body>"
+            for text in text_content:
+                raw_html += f'<div>{text}</div>'
             for cid, filename in content_ids:
                 raw_html += create_html_element(filename)
             raw_html += "\n</body></html>"
