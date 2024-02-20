@@ -72,6 +72,9 @@ def eml_to_html(eml_path_str: Union[str, Path], output_path: str, save_attachmen
 
             if ext == ".html" and not raw_html:
                 raw_html = part.get_payload(decode=True).decode()
+                # ignore weird apple message format html
+                if 'application/x-apple-msg-attachment' in raw_html:
+                    raw_html = None
             elif ext == ".txt":
                 text_content.append(part.get_payload(decode=True).decode())
             else:
