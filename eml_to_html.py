@@ -124,7 +124,8 @@ def eml_to_html(eml_path_str: Union[str, Path], output_path: str, save_attachmen
             # replace cids in html with img path
             raw_html = f"{raw_html}".lstrip("b'").rstrip("'")
             for text in text_content:
-                raw_html += f'<div>{text}</div>'
+                if text.strip():
+                    raw_html += f'<div>{text}</div>'
             for cid, filename in content_ids:
                 if not filename:
                     print(f"🟡 Skipping cid; no filename; {cid}")
@@ -136,7 +137,8 @@ def eml_to_html(eml_path_str: Union[str, Path], output_path: str, save_attachmen
             # create html from img paths
             raw_html = "<html><head><link rel='stylesheet' type='text/css' href='../../index.css'><meta charset='utf-8'></head><body>"
             for text in text_content:
-                raw_html += f'<div>{text}</div>'
+                if text.strip():
+                    raw_html += f'<div>{text}</div>'
             for cid, filename in content_ids:
                 raw_html += create_html_element(filename)
             raw_html += "\n</body></html>"
